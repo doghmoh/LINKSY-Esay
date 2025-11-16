@@ -1,0 +1,188 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply font-sans;
+  }
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+}
+
+.scrollbar-track-gray-100::-webkit-scrollbar-track {
+  background-color: #f3f4f6;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Focus styles for better accessibility */
+.focus-visible:focus {
+  outline: 2px solid #DC0032;
+  outline-offset: 2px;
+}
+
+/* Ensure smooth transitions */
+* {
+  @apply transition-colors duration-200 ease-in-out;
+}
+
+/* Add some base body styling */
+body {
+  @apply antialiased font-sans text-gray-800 bg-gray-50;
+  line-height: 1.6;
+}
+
+/* Style for auto-resizing textarea */
+textarea {
+  overflow: hidden; /* Prevent scrollbar flash during resize */
+  resize: vertical;
+}
+
+/* Form input styles */
+.form-input {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#DC0032] focus:border-[#DC0032] transition-colors;
+}
+
+.form-input:disabled {
+  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+}
+
+.form-select {
+  @apply form-input pr-10 bg-white;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+}
+
+/* Button styles */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply btn bg-[#DC0032] text-white hover:bg-[#c40029] focus:ring-[#DC0032];
+}
+
+.btn-secondary {
+  @apply btn bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500;
+}
+
+.btn-danger {
+  @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+}
+
+.card-header {
+  @apply border-b border-gray-200 pb-4 mb-4;
+}
+
+/* Table styles */
+.table {
+  @apply w-full text-sm;
+}
+
+.table th {
+  @apply text-left py-3 px-4 font-medium text-gray-600 bg-gray-50 border-b border-gray-200;
+}
+
+.table td {
+  @apply py-3 px-4 border-b border-gray-100;
+}
+
+.table tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Simple Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Utility classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+.container-responsive {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-auto {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
