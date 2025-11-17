@@ -1,41 +1,30 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useNotifications } from "./hooks/useNotifications";
-import NotificationSystem from "./components/ui/NotificationSystem";
-import Dashboard from "./components/Dashboard";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Restricted from "./pages/Restricted";
-import ManageHosting from "./pages/Hosting/ManageHosting";
-import ManageDomains from "./pages/Domains/ManageDomains";
-import Register2 from "./pages/Register2";
-import Login2 from "./pages/Login2";
-import ResetPassword from "./pages/ResetPassword";
-import ResetPasswordConfirm from "./pages/ResetPasswordConfirm";
-import EmailTemplatesPreview from "./pages/EmailTemplatesPreview";
-import SubscriptionDetails from "./pages/Facturation/SubscriptionDetails";
+import Login2 from "./modules/auth/pages/Login2";
+import Register2 from "./modules/auth/pages/Register2";
+import ResetPassword from "./modules/auth/pages/ResetPassword";
+import ResetPasswordConfirm from "./modules/auth/pages/ResetPasswordConfirm";
+import NotificationSystem from "./shared/components/ui/NotificationSystem";
+import { useNotifications } from "./shared/hooks/useNotifications";
 
 function App() {
   const { notifications, removeNotification } = useNotifications();
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/restricted" element={<Restricted />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Login2 />} />
+          <Route path="/login" element={<Login2 />} />
+          <Route path="/register" element={<Register2 />} />
           <Route path="/register2" element={<Register2 />} />
           <Route path="/login2" element={<Login2 />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/reset" element={<ResetPasswordConfirm />} />
-          <Route path="/email-templates" element={<EmailTemplatesPreview />} />
-          <Route path="/hosting/manage" element={<ManageHosting />} />
-          <Route path="/domains/manage" element={<ManageDomains />} />
-          <Route
-            path="/facturation/abonnements/:subId"
-            element={<SubscriptionDetails />}
-          />
         </Routes>
         <NotificationSystem
           notifications={notifications}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, ArrowLeft, Check, Loader2, ArrowRight, Lock } from 'lucide-react';
-import Logo from '../components/navigation/Logo';
+import Logo from "../../../shared/components/navigation/Logo";
 
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState('');

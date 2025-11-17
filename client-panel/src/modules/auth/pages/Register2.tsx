@@ -2,8 +2,8 @@ import React, { useState, useRef, KeyboardEvent, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, User, Building, Phone, ArrowRight, Check, Briefcase, Code, Eye, EyeOff, Loader2, AlertCircle, CheckCircle, Shield } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
-import { validateEmail, validatePassword, validateRequired } from '../utils/validation';
-import Logo from '../components/navigation/Logo';
+import { validateEmail, validatePassword, validateRequired } from '../../../shared/utils/validation';
+import Logo from "../../../shared/components/navigation/Logo";
 
 type Step = 'emailEntry' | 'verifyEmail' | 'personalDetails' | 'verifyPhone' | 'accountType' | 'setPassword';
 

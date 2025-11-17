@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Lock, ArrowLeft, Check, Loader2, Eye, EyeOff } from 'lucide-react';
-import Logo from '../components/navigation/Logo';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { Lock, ArrowLeft, Check, Loader2, Eye, EyeOff } from "lucide-react";
+import Logo from "../../../shared/components/navigation/Logo";
 
 const ResetPasswordConfirm: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string; general?: string }>({});
+  const [errors, setErrors] = useState<{
+    password?: string;
+    confirmPassword?: string;
+    general?: string;
+  }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [token, setToken] = useState<string | null>(null);
@@ -17,9 +21,12 @@ const ResetPasswordConfirm: React.FC = () => {
 
   useEffect(() => {
     // Get the token from URL parameters (e.g., /reset?token=xyz)
-    const tokenParam = searchParams.get('token');
+    const tokenParam = searchParams.get("token");
     if (!tokenParam) {
-      setErrors({ general: 'Lien invalide ou expiré. Veuillez demander un nouveau lien de réinitialisation.' });
+      setErrors({
+        general:
+          "Lien invalide ou expiré. Veuillez demander un nouveau lien de réinitialisation.",
+      });
     }
     setToken(tokenParam);
   }, [searchParams]);
@@ -30,25 +37,30 @@ const ResetPasswordConfirm: React.FC = () => {
     const hasUpperCase = /[A-Z]/.test(passwordValue);
     const hasLowerCase = /[a-z]/.test(passwordValue);
     const hasNumber = /[0-9]/.test(passwordValue);
-    
+
     return minLength && hasUpperCase && hasLowerCase && hasNumber;
   };
 
   const validate = () => {
-    const newErrors: { password?: string; confirmPassword?: string; general?: string } = {};
-    
+    const newErrors: {
+      password?: string;
+      confirmPassword?: string;
+      general?: string;
+    } = {};
+
     if (!password) {
       newErrors.password = "Le mot de passe est requis.";
     } else if (!validatePassword(password)) {
-      newErrors.password = "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.";
+      newErrors.password =
+        "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.";
     }
-    
+
     if (!confirmPassword) {
       newErrors.confirmPassword = "Veuillez confirmer votre mot de passe.";
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = "Les mots de passe ne correspondent pas.";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -56,32 +68,32 @@ const ResetPasswordConfirm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
+
     if (!token) {
-      setErrors({ general: 'Lien invalide ou expiré.' });
+      setErrors({ general: "Lien invalide ou expiré." });
       return;
     }
-    
+
     if (!validate()) {
       return;
     }
-    
+
     setIsLoading(true);
 
     // Simulate API call to reset password
     setTimeout(() => {
       setIsSuccess(true);
       setIsLoading(false);
-      
+
       // Redirect to login after 2 seconds
       setTimeout(() => {
-        navigate('/login2');
+        navigate("/login2");
       }, 2000);
     }, 1500);
   };
 
   const handleBackToLogin = () => {
-    navigate('/login2');
+    navigate("/login2");
   };
 
   // Success Screen
@@ -97,12 +109,12 @@ const ResetPasswordConfirm: React.FC = () => {
               <div className="absolute top-1/3 -left-20 w-64 h-64 bg-white/5 rounded-full"></div>
               <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-white/5 rounded-full"></div>
             </div>
-            
+
             <div className="relative z-10 flex flex-col h-full justify-between">
               <div className="mb-8">
                 <Logo />
               </div>
-              
+
               <div className="flex-1 flex flex-col justify-center max-w-lg">
                 <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 border border-white/20">
                   <Check className="w-8 h-8 text-white" strokeWidth={2} />
@@ -111,10 +123,11 @@ const ResetPasswordConfirm: React.FC = () => {
                   Mot de passe modifié
                 </h1>
                 <p className="text-white/90 text-xl leading-relaxed font-light">
-                  Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.
+                  Votre mot de passe a été réinitialisé avec succès. Vous pouvez
+                  maintenant vous connecter.
                 </p>
               </div>
-              
+
               <div className="mt-auto pt-12 border-t border-white/10">
                 <p className="text-white/70 text-sm font-light">
                   Redirection en cours...
@@ -128,13 +141,16 @@ const ResetPasswordConfirm: React.FC = () => {
             <div className="md:hidden px-6 py-4 border-b border-gray-100 flex justify-center">
               <Logo variant="light" />
             </div>
-            
+
             <div className="flex-1 flex items-center justify-center p-8 md:p-12 overflow-y-auto">
               <div className="w-full max-w-md">
                 <div className="text-center mb-10">
                   <div className="w-24 h-24 mx-auto mb-6 bg-green-50 rounded-full flex items-center justify-center animate-fade-in-up">
                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                      <Check className="w-10 h-10 text-green-600" strokeWidth={2.5} />
+                      <Check
+                        className="w-10 h-10 text-green-600"
+                        strokeWidth={2.5}
+                      />
                     </div>
                   </div>
                   <h2 className="text-4xl font-light text-gray-900 mb-3 tracking-tight">
@@ -144,11 +160,12 @@ const ResetPasswordConfirm: React.FC = () => {
                     Votre mot de passe a été réinitialisé avec succès.
                   </p>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div className="bg-green-50 border border-green-200 rounded-xl p-6">
                     <p className="text-sm text-green-800">
-                      Vous allez être redirigé vers la page de connexion dans quelques instants...
+                      Vous allez être redirigé vers la page de connexion dans
+                      quelques instants...
                     </p>
                   </div>
 
@@ -183,12 +200,12 @@ const ResetPasswordConfirm: React.FC = () => {
             <div className="absolute top-1/3 -left-20 w-64 h-64 bg-white/5 rounded-full"></div>
             <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-white/5 rounded-full"></div>
           </div>
-          
+
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div className="mb-8">
               <Logo />
             </div>
-            
+
             <div className="flex-1 flex flex-col justify-center max-w-lg">
               <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 border border-white/20">
                 <Lock className="w-8 h-8 text-white" strokeWidth={2} />
@@ -197,10 +214,11 @@ const ResetPasswordConfirm: React.FC = () => {
                 Nouveau mot de passe
               </h1>
               <p className="text-white/90 text-xl leading-relaxed font-light">
-                Choisissez un mot de passe fort et unique pour sécuriser votre compte.
+                Choisissez un mot de passe fort et unique pour sécuriser votre
+                compte.
               </p>
             </div>
-            
+
             <div className="mt-auto pt-12 border-t border-white/10">
               <p className="text-white/70 text-sm font-light italic">
                 "Votre sécurité est notre priorité"
@@ -214,7 +232,7 @@ const ResetPasswordConfirm: React.FC = () => {
           <div className="md:hidden px-6 py-4 border-b border-gray-100 flex justify-center">
             <Logo color="#DC0032" />
           </div>
-          
+
           <div className="flex-1 flex items-center justify-center p-8 md:p-12 overflow-y-auto">
             <div className="w-full max-w-md">
               <div className="text-center mb-10">
@@ -225,19 +243,31 @@ const ResetPasswordConfirm: React.FC = () => {
                   Entrez votre nouveau mot de passe ci-dessous
                 </p>
               </div>
-              
+
               {/* Error for invalid token */}
               {errors.general && !token && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 animate-fade-in-up">
                   <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <svg
+                      className="w-5 h-5 text-red-500 flex-shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
                     </svg>
-                    <p className="text-sm text-red-700 font-medium">{errors.general}</p>
+                    <p className="text-sm text-red-700 font-medium">
+                      {errors.general}
+                    </p>
                   </div>
                   <div className="mt-4">
-                    <Link 
-                      to="/reset-password" 
+                    <Link
+                      to="/reset-password"
                       className="text-sm text-red-700 hover:text-red-800 underline font-medium"
                     >
                       Demander un nouveau lien
@@ -245,37 +275,41 @@ const ResetPasswordConfirm: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Reset Form */}
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Password Field */}
                 <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Nouveau mot de passe
                   </label>
                   <div className="relative group">
-                    <Lock 
+                    <Lock
                       className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors pointer-events-none z-10 ${
-                        errors.password 
-                          ? 'text-red-500' 
-                          : 'text-gray-400 group-focus-within:text-[#DC0032]'
+                        errors.password
+                          ? "text-red-500"
+                          : "text-gray-400 group-focus-within:text-[#DC0032]"
                       }`}
-                      size={20} 
+                      size={20}
                     />
-                    <input 
+                    <input
                       type={showPassword ? "text" : "password"}
-                      id="password" 
-                      name="password" 
-                      value={password} 
-                      onChange={(e) => setPassword(e.target.value)} 
+                      id="password"
+                      name="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       aria-label="Nouveau mot de passe"
                       aria-invalid={!!errors.password}
                       className={`w-full pl-12 pr-12 py-3.5 text-base border-2 rounded-xl transition-all duration-200 ease-out placeholder-gray-400
-                        ${errors.password 
-                          ? 'border-red-500 bg-red-50/50 focus:border-red-600 focus:bg-red-50 focus:ring-4 focus:ring-red-100' 
-                          : 'bg-white border-gray-200 hover:border-gray-300 focus:border-[#DC0032] focus:shadow-sm'
-                        } focus:outline-none`} 
-                      placeholder="••••••••" 
+                        ${
+                          errors.password
+                            ? "border-red-500 bg-red-50/50 focus:border-red-600 focus:bg-red-50 focus:ring-4 focus:ring-red-100"
+                            : "bg-white border-gray-200 hover:border-gray-300 focus:border-[#DC0032] focus:shadow-sm"
+                        } focus:outline-none`}
+                      placeholder="••••••••"
                       disabled={!token}
                     />
                     <button
@@ -296,21 +330,47 @@ const ResetPasswordConfirm: React.FC = () => {
                   {/* Password Strength Indicators */}
                   {password && (
                     <div className="ml-1 space-y-1">
-                      <p className="text-xs text-gray-600 font-medium">Votre mot de passe doit contenir :</p>
+                      <p className="text-xs text-gray-600 font-medium">
+                        Votre mot de passe doit contenir :
+                      </p>
                       <ul className="text-xs space-y-0.5">
-                        <li className={`flex items-center gap-1 ${password.length >= 8 ? 'text-green-600' : 'text-gray-500'}`}>
+                        <li
+                          className={`flex items-center gap-1 ${
+                            password.length >= 8
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }`}
+                        >
                           <Check size={14} strokeWidth={2.5} />
                           Au moins 8 caractères
                         </li>
-                        <li className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? 'text-green-600' : 'text-gray-500'}`}>
+                        <li
+                          className={`flex items-center gap-1 ${
+                            /[A-Z]/.test(password)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }`}
+                        >
                           <Check size={14} strokeWidth={2.5} />
                           Une lettre majuscule
                         </li>
-                        <li className={`flex items-center gap-1 ${/[a-z]/.test(password) ? 'text-green-600' : 'text-gray-500'}`}>
+                        <li
+                          className={`flex items-center gap-1 ${
+                            /[a-z]/.test(password)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }`}
+                        >
                           <Check size={14} strokeWidth={2.5} />
                           Une lettre minuscule
                         </li>
-                        <li className={`flex items-center gap-1 ${/[0-9]/.test(password) ? 'text-green-600' : 'text-gray-500'}`}>
+                        <li
+                          className={`flex items-center gap-1 ${
+                            /[0-9]/.test(password)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }`}
+                        >
                           <Check size={14} strokeWidth={2.5} />
                           Un chiffre
                         </li>
@@ -321,47 +381,59 @@ const ResetPasswordConfirm: React.FC = () => {
 
                 {/* Confirm Password Field */}
                 <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Confirmer le mot de passe
                   </label>
                   <div className="relative group">
-                    <Lock 
+                    <Lock
                       className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors pointer-events-none z-10 ${
-                        errors.confirmPassword 
-                          ? 'text-red-500' 
-                          : 'text-gray-400 group-focus-within:text-[#DC0032]'
+                        errors.confirmPassword
+                          ? "text-red-500"
+                          : "text-gray-400 group-focus-within:text-[#DC0032]"
                       }`}
-                      size={20} 
+                      size={20}
                     />
-                    <input 
+                    <input
                       type={showConfirmPassword ? "text" : "password"}
-                      id="confirmPassword" 
-                      name="confirmPassword" 
-                      value={confirmPassword} 
-                      onChange={(e) => setConfirmPassword(e.target.value)} 
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       aria-label="Confirmer le mot de passe"
                       aria-invalid={!!errors.confirmPassword}
                       className={`w-full pl-12 pr-12 py-3.5 text-base border-2 rounded-xl transition-all duration-200 ease-out placeholder-gray-400
-                        ${errors.confirmPassword 
-                          ? 'border-red-500 bg-red-50/50 focus:border-red-600 focus:bg-red-50 focus:ring-4 focus:ring-red-100' 
-                          : 'bg-white border-gray-200 hover:border-gray-300 focus:border-[#DC0032] focus:shadow-sm'
-                        } focus:outline-none`} 
-                      placeholder="••••••••" 
+                        ${
+                          errors.confirmPassword
+                            ? "border-red-500 bg-red-50/50 focus:border-red-600 focus:bg-red-50 focus:ring-4 focus:ring-red-100"
+                            : "bg-white border-gray-200 hover:border-gray-300 focus:border-[#DC0032] focus:shadow-sm"
+                        } focus:outline-none`}
+                      placeholder="••••••••"
                       disabled={!token}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       tabIndex={-1}
                     >
-                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showConfirmPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
                     </button>
-                    {confirmPassword && password === confirmPassword && !errors.confirmPassword && (
-                      <div className="absolute right-12 top-1/2 -translate-y-1/2 text-green-500 animate-fade-in">
-                        <Check size={20} strokeWidth={2.5} />
-                      </div>
-                    )}
+                    {confirmPassword &&
+                      password === confirmPassword &&
+                      !errors.confirmPassword && (
+                        <div className="absolute right-12 top-1/2 -translate-y-1/2 text-green-500 animate-fade-in">
+                          <Check size={20} strokeWidth={2.5} />
+                        </div>
+                      )}
                   </div>
                   {errors.confirmPassword && (
                     <p className="text-sm text-red-500 ml-1 flex items-center gap-1">
@@ -375,10 +447,22 @@ const ResetPasswordConfirm: React.FC = () => {
                 {errors.general && token && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 animate-fade-in-up">
                     <div className="flex items-center gap-2 justify-center">
-                      <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      <svg
+                        className="w-5 h-5 text-red-500 flex-shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
                       </svg>
-                      <p className="text-sm text-red-700 font-medium">{errors.general}</p>
+                      <p className="text-sm text-red-700 font-medium">
+                        {errors.general}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -387,16 +471,25 @@ const ResetPasswordConfirm: React.FC = () => {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    disabled={isLoading || !password.trim() || !confirmPassword.trim() || !token}
+                    disabled={
+                      isLoading ||
+                      !password.trim() ||
+                      !confirmPassword.trim() ||
+                      !token
+                    }
                     className={`w-full py-3.5 px-6 rounded-xl font-medium text-base 
                       focus:outline-none focus:ring-4 focus:ring-red-200
                       transition-all duration-200 flex items-center justify-center
                       shadow-sm hover:shadow-md
                       disabled:cursor-not-allowed group
-                      ${!password.trim() || !confirmPassword.trim() || isLoading || !token
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-                        : 'bg-[#DC0032] text-white hover:bg-[#B80029] active:scale-[0.98]'
-                    }`}
+                      ${
+                        !password.trim() ||
+                        !confirmPassword.trim() ||
+                        isLoading ||
+                        !token
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                          : "bg-[#DC0032] text-white hover:bg-[#B80029] active:scale-[0.98]"
+                      }`}
                   >
                     {isLoading ? (
                       <>
