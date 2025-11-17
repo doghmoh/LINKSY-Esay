@@ -7,7 +7,7 @@ const morgan = require("morgan");
 const helmet = require("helmet");
 const path = require("path");
 const errorHandler = require("../../shared/middleware/errorHandler");
-const routerV1 = require("./routes/v1");
+const authRotutes = require("./modules/auth/auth.route");
 
 // Load env variables
 dotenv.config();
@@ -30,8 +30,8 @@ app.use(helmet());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Example route
-app.get("/", (req, res) => res.send("API running..."));
-app.use("/api/v1", routerV1);
+app.get("/", (req, res) => res.send("Auth API running..."));
+app.use("/api/v1/auth", authRotutes);
 
 // Error handler
 app.use(errorHandler);

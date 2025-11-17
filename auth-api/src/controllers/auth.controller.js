@@ -1,5 +1,5 @@
 const { generateToken } = require("@shared/utils/authHelper");
-const authService = require("./auth.service");
+const authService = require("../services/auth.service");
 
 exports.sendEmailLink = async (req, res) => {
   try {
@@ -24,8 +24,8 @@ exports.confirmEmail = async (req, res) => {
 exports.sendPhoneOtp = async (req, res) => {
   try {
     const { phone } = req.body;
-    const token = await authService.sendPhoneOtp(phone);
-    res.json({ success: true, token });
+    await authService.reqestOtp(phone);
+    res.json({ message: `OTP sent to ${phone}` });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -67,6 +67,26 @@ exports.loginWithEmail = async (req, res) => {
     const user = await authService.loginWithEmail(email, password);
     const token = generateToken(user, "7d");
     res.json({ success: true, user, token });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+exports.googleCallback = async (req, res) => {
+  try {
+    const { code } = req.query;
+    const { user, token } = await authService.loginWithGoogle(code);
+    res.json({ user, token });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+exports.githubCallback = async (req, res) => {
+  try {
+    const { code } = req.query;
+    const { user, token } = await authService.loginWithGithub(code);
+    res.json({ user, token });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

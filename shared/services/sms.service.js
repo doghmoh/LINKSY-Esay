@@ -1,29 +1,28 @@
+// src/providers/smsProvider.ts
 const axios = require("axios");
 const crypto = require("crypto");
 const https = require("https");
 
 const agent = new https.Agent({ rejectUnauthorized: false });
 
-exports.sendOtp = async (number) => {
+exports.sendSms = async (payload) => {
   const now = new Date().toISOString();
 
   const smsApiPassword = process.env.SMS_API_PASSWORD;
   const smsApiUrl = process.env.SMS_API_URL;
   const smsApiUsername = process.env.SMS_API_USER;
 
-  const otp = Math.floor(100000 + Math.random() * 900000);
-
   const digest = crypto.createHash("md5").update(smsApiPassword).digest("hex");
 
   // same as your sendOtp() message
   const message = {
-    clientRef: "900199",
-    number,
+    clientRef: payload.clientRef,
+    number: payload.number,
     mask: "LINKSY",
-    text: otp,
-    campaignName: "LINKSY_OTP_SENDER",
-    flash: 0,
-    isScheduled: 0,
+    text: payload.text,
+    campaignName: payload.campaignName || "Default Campaign",
+    flash: payload.flash || 0,
+    isScheduled: payload.isScheduled || 0,
   };
 
   try {
