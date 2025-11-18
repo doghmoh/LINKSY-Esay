@@ -10,8 +10,12 @@ function generateToken(user, expiresIn = "1h") {
   );
 }
 
+function generateEmailLinkToken(email) {
+  return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "24h" });
+}
+
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-module.exports = { generateOtp, generateToken };
+module.exports = { generateOtp, generateToken, generateEmailLinkToken };

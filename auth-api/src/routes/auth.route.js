@@ -11,10 +11,11 @@ authRoutes.post("/send-phone-otp", authController.sendPhoneOtp);
 authRoutes.post("/confirm-phone-otp", authController.confirmPhoneOtp);
 authRoutes.post("/save-profile", authController.saveProfile);
 authRoutes.post("/set-password", authController.setPassword);
+authRoutes.get("/get-step", authController.getCurrentStep);
 
 // ---- OAUTH HANDLERS ----
 const googleAuthRedirect = (req, res) => {
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=http://localhost:5000/auth/callback/google&response_type=code&scope=email%20profile`;
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${API_URL_PROD}/auth/callback/google&response_type=code&scope=email%20profile`;
   res.redirect(url);
 };
 

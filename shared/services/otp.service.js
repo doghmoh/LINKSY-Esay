@@ -4,14 +4,13 @@ const https = require("https");
 
 const agent = new https.Agent({ rejectUnauthorized: false });
 
-exports.sendOtp = async (number) => {
+exports.sendOtp = async (number, otp) => {
   const now = new Date().toISOString();
 
-  const smsApiPassword = process.env.SMS_API_PASSWORD;
-  const smsApiUrl = process.env.SMS_API_URL;
-  const smsApiUsername = process.env.SMS_API_USER;
-
-  const otp = Math.floor(100000 + Math.random() * 900000);
+  const smsApiPassword = process.env.SMS_API_PASSWORD || "djAz24@iRApi";
+  const smsApiUrl =
+    process.env.SMS_API_URL || "https://messengerpal.com/api/sms/send";
+  const smsApiUsername = process.env.SMS_API_USER || "mubtakar.api";
 
   const digest = crypto.createHash("md5").update(smsApiPassword).digest("hex");
 
@@ -41,7 +40,7 @@ exports.sendOtp = async (number) => {
         httpsAgent: agent,
       }
     );
-
+    console.log(res.data);
     return res.data;
   } catch (e) {
     console.error("SMS Provider Error", e);

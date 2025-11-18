@@ -1,73 +1,114 @@
 const bcrypt = require("bcryptjs");
+const path = require("path");
 const User = require("@shared/models/User");
 const {
   saveSession,
   getSession,
   deleteSession,
 } = require("@shared/utils/redisHelper");
-const { generateToken } = require("@shared/utils/authHelper");
+const {
+  generateToken,
+  generateEmailLinkToken,
+} = require("@shared/utils/authHelper");
 const { sendEmail } = require("@shared/services/mailer.service");
 const { sendOtp } = require("@shared/services/otp.service");
-const otpRateLimiter = require("@shared/utils/otpRateLimiter");
+const fs = require("fs");
 
-async function sendEmailLink(email) {
-  const token = generateToken();
-  await saveSession(token, { email, emailConfirmed: false }, 15 * 60);
-  const link = `${process.env.API_URL}/auth/confirm-email?token=${token}`;
+// Send account confirmation email
+async function sendEmailLink(email, userName) {
+  const token = generateEmailLinkToken(email);
+  await saveSession(
+    token,
+    { email, currentStep: "emailSent", profile: {} },
+    3600
+  );
+
+  const confirmationLink = `${process.env.API_URL_PROD}/auth/confirm-email?token=${token}`;
+
+  const templatePath = path.join(
+    __dirname,
+    "..", // services → src
+    "..", // src → auth-api
+    "..", // auth-api → LINKSY
+    "shared",
+    "templates",
+    "accountConfirmationEmail.html"
+  );
+
+  const templateHTML = fs.readFileSync(templatePath, "utf-8");
+  // Call mailer service with template variables
   await sendEmail(
     email,
-    "Confirm your email",
-    `Click <a href="${link}">here</a> to confirm`
+    "Confirmez votre compte",
+    {
+      userName,
+      confirmationLink,
+      expirationTime: "24 heures",
+      logo: "Votre Logo",
+      year: new Date().getFullYear(),
+      helpLink: "#",
+      contactLink: "#",
+      termsLink: "#",
+    },
+    templateHTML
   );
+
   return token;
 }
-
 async function confirmEmail(token) {
   const session = await getSession(token);
   if (!session) throw new Error("Invalid or expired token");
-  session.emailConfirmed = true;
-  await saveSession(token, session);
+  session.currentStep = "personalDetails";
+  await saveSession(token, session, 3600);
   return session;
 }
 
-async function reqestOtp(req, res) {
-  const phone = req.body.phone;
-  const ip = req.ip;
+async function requestOtp(phone, token) {
+  const session = await getSession(token);
+  if (!session) throw new Error("Invalid or expired token");
+  let otp;
+  if (process.env.NODE_ENV === "production") {
+    // generate a 6-digit OTP
+    otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  try {
-    await otpRateLimiter.consumeOtp(phone, ip);
-    await sendOtp(phone);
-    const token = generateToken();
-    await saveSession(token, { phone, phoneConfirmed: false, otp }, 10 * 60);
-    return token;
-  } catch (err) {
-    return res.status(429).json({ error: err.message });
+    // send OTP SMS
+    await sendOtp(phone, otp);
+  } else {
+    // development: just generate OTP without sending
+    otp = "123456";
   }
+
+  // save session in Redis for 10 minutes
+  await saveSession(token, { phone, currentStep: "verifyPhone", otp }, 10 * 60);
 }
 
 async function confirmPhone(token, otp) {
   const session = await getSession(token);
   if (!session) throw new Error("Invalid or expired token");
   if (session.otp !== otp) throw new Error("Invalid OTP");
-  session.phoneConfirmed = true;
+  session.currentStep = "accountType";
   delete session.otp;
   await saveSession(token, session);
   return session;
 }
 
-async function saveProfile(token, data) {
+async function saveProfile(token, profile) {
   const session = await getSession(token);
   if (!session) throw new Error("Session not found");
-  const updated = { ...session, ...data };
-  await saveSession(token, updated);
-  return updated;
+  // Merge new profile info
+  session.profile = { ...session.profile, ...profile };
+
+  // Determine next step
+  session.currentStep = "verifyPhone";
+
+  await saveSession(token, session, 3600);
 }
 
 async function setPasswordAndRegister(token, password) {
   const session = await getSession(token);
   if (!session) throw new Error("Session not found");
-  if (!session.emailConfirmed || !session.phoneConfirmed)
-    throw new Error("Email or phone not confirmed");
+  if (!session.currentStep === "setPassword")
+    throw new Error("Invalid or expired token");
 
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = await User.create({ ...session, password: hashedPassword });
@@ -81,15 +122,65 @@ async function loginWithEmail(email, password) {
   const isValid = await bcrypt.compare(password, user.password);
   if (!isValid) throw new Error("Invalid password");
   user.password = undefined;
-  return user;
+  const token = generateToken(user, "7d");
+  return { user, token };
+}
+
+async function loginWithGoogle(code) {
+  // 1. Get user by OAuth ID
+  let user = await User.findOne({ googleId: code });
+
+  // 2. If user exists
+  if (user) {
+    if (user.phoneConfirmed) {
+      // phone verified → issue token
+      const token = generateToken(user, "7d");
+      return { user, token };
+    } else {
+      // phone not verified → return phone verification URL
+      return { nextStep: `/verify-phone?userId=${user._id}` };
+    }
+  }
+
+  // 3. User does not exist → create account (email verification)
+  const newUser = await User.create({
+    googleId: code,
+    email: "extracted-from-google", // fetch from Google API
+    isEmailVerified: false,
+    isPhoneVerified: false,
+  });
+
+  return { nextStep: `/verify-email?userId=${newUser._id}` };
+}
+
+async function loginWithGithub(code) {
+  let user = await User.findOne({ githubId: code });
+
+  if (user) {
+    if (user.phoneConfirmed) {
+      const token = generateToken(user, "7d");
+      return { user, token };
+    } else {
+      return { nextStep: `/verify-phone?userId=${user._id}` };
+    }
+  }
+
+  const newUser = await User.create({
+    githubId: code,
+    email: "extracted-from-github",
+  });
+
+  return { nextStep: `/verify-email?userId=${newUser._id}` };
 }
 
 module.exports = {
   sendEmailLink,
   confirmEmail,
-  reqestOtp,
+  requestOtp,
   confirmPhone,
   saveProfile,
   setPasswordAndRegister,
   loginWithEmail,
+  loginWithGoogle,
+  loginWithGithub,
 };

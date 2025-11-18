@@ -1,6 +1,3 @@
-// middleware/apiKeyAuth.js
-const dotenv = require("dotenv");
-dotenv.config();
 const jwt = require("jsonwebtoken");
 
 const apiKeyAuth = (req, res, next) => {

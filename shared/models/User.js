@@ -12,8 +12,15 @@ const userSchema = new mongoose.Schema(
     address: { type: String },
     wilaya: { type: String },
     commune: { type: String },
+    organizationName: { type: String },
+    organizationType: { type: String },
+    organizationAddress: { type: String },
+    organizationWilaya: { type: String },
+    organizationCommune: { type: String },
     accountType: { type: String, enum: ["developer", "organization"] },
     password: { type: String },
+    githubId: { type: String },
+    googleId: { type: String },
   },
   { timestamps: true }
 );

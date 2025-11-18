@@ -7,16 +7,26 @@ const helmet = require("helmet");
 const authRoutes = require("./routes/auth.route");
 const errorHandler = require("@shared/middleware/errorHandler");
 const { format, transports, loggers } = require("winston");
+const path = require("path");
+const { apiKeyAuth } = require("@shared/middleware/apiKeyAuth");
 
-dotenv.config();
+dotenv.config({
+  path: path.join(__dirname, "..", ".env"),
+});
+dotenv.config({
+  path: path.join(__dirname, "..", "..", "shared", ".env"),
+});
+
 const app = express();
 
 // ----------------------
 // Middleware
 // ----------------------
+const allowedOrigins = ["http://localhost:5173", "http://161.97.153.124:4001"];
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", process.env.ORIGIN],
+    origin: allowedOrigins,
     credentials: true,
     exposedHeaders: ["Content-Disposition"],
   })
@@ -52,6 +62,9 @@ if (process.env.NODE_ENV === "development") {
 // Routes
 // ----------------------
 app.get("/", (req, res) => res.send("Auth API running..."));
+app.get("/health", (req, res) =>
+  res.json({ status: "ok", service: "auth-api" })
+);
 app.use("/api/v1/auth", authRoutes);
 
 // ----------------------

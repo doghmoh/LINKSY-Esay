@@ -5,12 +5,15 @@ const {
   getSession,
   deleteSession,
 } = require("@shared/utils/redisHelper");
-const { generateToken, generateOtp } = require("@shared/utils/authHelper");
+const {
+  generateToken,
+  generateEmailLinkToken,
+} = require("@shared/utils/authHelper");
 const { sendEmail } = require("@shared/services/mailer.service");
 const { sendOtp } = require("@shared/services/otp.service");
 
 async function sendEmailLink(email) {
-  const token = generateToken();
+  const token = generateEmailLinkToken();
   await saveSession(token, { email, emailConfirmed: false }, 15 * 60);
   const link = `${process.env.API_URL}/auth/confirm-email?token=${token}`;
   await sendEmail(
@@ -31,7 +34,7 @@ async function confirmEmail(token) {
 
 async function sendPhoneOtp(phone) {
   await sendOtp(phone);
-  const token = generateToken();
+  const token = generateEmailLinkToken(phone);
   await saveSession(token, { phone, phoneConfirmed: false, otp }, 10 * 60);
   return token;
 }
